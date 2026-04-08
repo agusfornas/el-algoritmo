@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Algoritmo — Tech sin filtros</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#f2f0ea;
+    --surface:#ffffff;
+    --surface-2:#e8e5db;
+    --green:#00a859;
+    --green-bright:#00d46a;
+    --purple:#6d28d9;
+    --pink:#ec4899;
+    --text:#0d1117;
+    --text-mid:#3a3f4b;
+    --muted:#6b7280;
+    --border:#c9c4b4;
+    --border-soft:#d8d4c4;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;line-height:1.6;
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(109,40,217,0.07) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(0,168,89,0.08) 0%, transparent 45%);
+  }
+  a{color:inherit;text-decoration:none;}
+
+  /* Top bar */
+  .topbar{background:var(--green);color:#fff;padding:0.45rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--text);}
+  .topbar-brand{font-family:'Space Mono',monospace;font-weight:700;font-size:0.75rem;letter-spacing:0.12em;}
+  .topbar-date{font-size:0.72rem;font-weight:700;font-family:'Space Mono',monospace;}
+
+  /* Ticker */
+  .ticker-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;padding:0.55rem 0;}
+  .ticker-label{display:inline-block;background:var(--purple);color:#fff;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:0.25rem 0.75rem;margin-right:1rem;font-family:'Space Mono',monospace;vertical-align:middle;}
+  .ticker-inner{display:inline-block;white-space:nowrap;animation:ticker 42s linear infinite;font-size:0.78rem;color:var(--text);font-family:'Space Mono',monospace;font-weight:500;}
+  .ticker-inner .g{color:var(--green);}
+  .ticker-inner .p{color:var(--purple);}
+  @keyframes ticker{0%{transform:translateX(100vw);}100%{transform:translateX(-100%);}}
+
+  /* Header */
+  .header{max-width:1200px;margin:2.5rem auto 0;padding:0 2rem 1.5rem;border-bottom:1px solid var(--border);position:relative;}
+  .header::after{content:"";position:absolute;bottom:-1px;left:2rem;width:200px;height:3px;background:linear-gradient(90deg,var(--green),var(--purple));}
+  .logo-row{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;}
+  .logo{font-family:'Space Mono',monospace;font-size:3.4rem;font-weight:700;line-height:1;letter-spacing:-0.02em;}
+  .logo .bracket{color:var(--green);}
+  .logo .name{color:var(--text);}
+  .logo .cursor{color:var(--purple);animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .logo-sub{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:0.5rem;}
+  .logo-sub .accent{color:var(--green);}
+
+  /* Main */
+  .main{max-width:1200px;margin:0 auto;padding:2rem 2rem 3rem;}
+
+  /* Hero */
+  .hero{display:grid;grid-template-columns:1fr 400px;gap:2.5rem;margin-bottom:3rem;}
+  .hero-content{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--green);padding:2rem;position:relative;}
+  .hero-content::before{content:"// 01";position:absolute;top:0.6rem;right:1rem;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+  .hero-badge{display:inline-block;background:var(--purple);color:#fff;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;padding:0.3rem 0.7rem;margin-bottom:1rem;font-family:'Space Mono',monospace;}
+  .hero-title{font-size:2rem;font-weight:700;line-height:1.15;margin-bottom:0.8rem;cursor:pointer;color:var(--text);text-transform:uppercase;letter-spacing:-0.01em;}
+  .hero-title:hover{color:var(--green);}
+  .hero-sub{font-size:1rem;color:var(--text-mid);margin-bottom:0.9rem;font-weight:500;}
+  .hero-body{font-size:0.9rem;color:var(--text-mid);}
+  .hero-meta{font-size:0.7rem;color:var(--muted);margin-top:1rem;font-family:'Space Mono',monospace;}
+  .hero-image{border:1px solid var(--border);overflow:hidden;position:relative;background:var(--surface);}
+  .hero-image img{width:100%;height:340px;object-fit:cover;display:block;filter:contrast(1.05) saturate(1.05);mix-blend-mode:multiply;}
+  .hero-image::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,168,89,0.15) 0%,transparent 40%,transparent 60%,rgba(109,40,217,0.18) 100%);pointer-events:none;}
+  .btn-read{display:inline-block;margin-top:1rem;padding:0.6rem 1.4rem;background:var(--green);color:#fff;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;font-family:'Space Mono',monospace;border:none;transition:all 0.2s;}
+  .btn-read:hover{background:var(--text);color:var(--green-bright);}
+
+  /* Section head */
+  .section-head{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--text);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:1.5rem;padding-bottom:0.6rem;border-bottom:2px solid var(--text);display:flex;justify-content:space-between;align-items:center;}
+  .section-head .accent{color:var(--green);}
+  .section-head .count{color:var(--muted);font-size:0.65rem;}
+
+  /* Grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem;}
+  .card{background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;overflow:hidden;position:relative;}
+  .card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:0 8px 20px rgba(109,40,217,0.08);}
+  .card-img-wrap{position:relative;height:170px;overflow:hidden;background:var(--surface-2);}
+  .card-img-wrap img{width:100%;height:100%;object-fit:cover;filter:contrast(1.05) saturate(0.95);mix-blend-mode:multiply;}
+  .card-img-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,168,89,0.12),transparent 50%,rgba(109,40,217,0.12));pointer-events:none;}
+  .card-content{padding:1.25rem;}
+  .card-badge{display:inline-block;background:var(--surface-2);color:var(--purple);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.55rem;margin-bottom:0.6rem;font-family:'Space Mono',monospace;border:1px solid var(--border);}
+  .card-title{font-size:1.05rem;font-weight:700;line-height:1.25;margin-bottom:0.5rem;text-transform:uppercase;color:var(--text);}
+  .card-body{font-size:0.83rem;color:var(--text-mid);line-height:1.6;}
+  .card-meta{font-size:0.65rem;color:var(--muted);margin-top:0.7rem;font-family:'Space Mono',monospace;}
+
+  /* Teasers */
+  .teasers{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+  .teaser{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--purple);padding:1.5rem;cursor:pointer;}
+  .teaser:hover{border-left-color:var(--green);}
+  .teaser-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem;text-transform:uppercase;color:var(--text);}
+  .teaser-body{font-size:0.83rem;color:var(--text-mid);}
+  .teaser-meta{font-size:0.63rem;color:var(--muted);margin-top:0.6rem;font-family:'Space Mono',monospace;}
+  .teaser.editor{border-left-color:var(--green);cursor:default;background:linear-gradient(135deg,#fff 0%,#f0f7f2 100%);}
+  .teaser.editor .teaser-title{color:var(--green);}
+
+  footer{background:var(--text);color:#c9c4b4;padding:2rem;text-align:center;font-size:0.74rem;font-family:'Space Mono',monospace;border-top:3px solid var(--green);}
+  .footer-logo{font-size:1.6rem;color:var(--green-bright);margin-bottom:0.5rem;font-weight:700;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,17,23,0.78);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center;padding:2rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--green);max-width:720px;width:100%;max-height:85vh;overflow-y:auto;position:relative;}
+  .modal-close{position:absolute;top:1rem;right:1rem;font-family:'Space Mono',monospace;font-size:0.7rem;color:#fff;cursor:pointer;background:var(--purple);border:none;padding:0.35rem 0.7rem;text-transform:uppercase;letter-spacing:0.08em;z-index:2;font-weight:700;}
+  .modal-img{width:100%;height:220px;object-fit:cover;display:block;filter:contrast(1.05) saturate(0.95);mix-blend-mode:multiply;background:var(--surface-2);}
+  .modal-content{padding:2rem;}
+  .modal-badge{display:inline-block;background:var(--purple);color:#fff;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;padding:0.25rem 0.65rem;margin-bottom:0.7rem;font-family:'Space Mono',monospace;}
+  .modal-title{font-size:1.7rem;font-weight:700;line-height:1.15;margin-bottom:0.6rem;text-transform:uppercase;color:var(--text);}
+  .modal-sub{font-size:0.95rem;color:var(--text-mid);margin-bottom:0.7rem;font-weight:500;}
+  .modal-meta{font-size:0.68rem;color:var(--muted);margin-bottom:1.3rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;}
+  .modal-body p{font-size:0.92rem;color:var(--text-mid);line-height:1.8;margin-bottom:0.9rem;}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;}
+    .hero-image{order:-1;}
+    .hero-image img{height:260px;}
+    .grid{grid-template-columns:1fr 1fr;}
+    .teasers{grid-template-columns:1fr;}
+  }
+  @media(max-width:600px){
+    .logo{font-size:2.2rem;}
+    .hero-title{font-size:1.4rem;}
+    .grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand">// EL ALGORITMO // TECH SIN FILTROS //</div>
+  <div class="topbar-date">MIÉRCOLES 08.04.2026</div>
+</div>
+<div class="ticker-wrap">
+  <span class="ticker-label">BREAKING</span>
+  <span class="ticker-inner"><span class="g">⚡ IA reduce consumo energético 100x</span> — ¿O sea que todos esos centros de datos eran innecesarios? &nbsp;|&nbsp; <span class="p">OpenAI a $852B de valuación</span> — Sam Altman buscando IPO mientras el hype aguanta &nbsp;|&nbsp; <span class="g">Q1 2026: $297B en funding</span> — El dinero de VC nunca aprendió a nadar &nbsp;|&nbsp; <span class="p">Broadcom + Anthropic: 3.5 gigawatts</span> de compute exclusivo — La stratificación de la IA está acá &nbsp;|&nbsp; <span class="g">NIST regulando agentes de IA</span> — Spoiler: nadie va a leer el estándar &nbsp;&nbsp;</span>
+</div>
+
+<header class="header">
+  <div class="logo-row">
+    <div class="logo"><span class="bracket">&lt;</span><span class="name">EL_ALGORITMO</span><span class="bracket">/&gt;</span><span class="cursor">_</span></div>
+  </div>
+  <div class="logo-sub">// tecnología <span class="accent">&times;</span> IA <span class="accent">&times;</span> startups // para los que no se tragan el hype //</div>
+</header>
+
+<main class="main">
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">// FEATURE · EFICIENCIA ENERGÉTICA</div>
+      <div class="hero-title" onclick="openModal('m1')">LA IA PODRÍA CONSUMIR 100 VECES MENOS ENERGÍA. ENTONCES, ¿POR QUÉ CONSTRUIMOS 10.000 CENTROS DE DATOS?</div>
+      <div class="hero-sub">Científicos publican que la computación neurosimbólica puede reducir el consumo de IA un 100x. Nadie en Silicon Valley parece haber recibido el memo.</div>
+      <div class="hero-body">Mientras las Big Tech compiten por ver quién construye el data center más gigante del universo, unos investigadores tranquilamente publican que hay una manera mucho más eficiente de hacer todo esto. Bienvenidos al capitalismo de la IA: primero se construye, después se piensa.</div>
+      <div class="hero-meta">05.04.2026 // ScienceDaily</div>
+      <button class="btn-read" onclick="openModal('m1')">LEER ANÁLISIS →</button>
+    </div>
+    <div class="hero-image">
+      <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=85" alt="Datacenter">
+    </div>
+  </section>
+
+  <div class="section-head">
+    <span>// <span class="accent">noticias</span> que no te dejarán dormir //</span>
+    <span class="count">04 items</span>
+  </div>
+
+  <div class="grid">
+    <div class="card" onclick="openModal('m2')">
+      <div class="card-img-wrap"><img src="https://images.unsplash.com/photo-1591696205602-2f950c417cb9?w=800&q=80" alt="Markets"></div>
+      <div class="card-content">
+        <div class="card-badge">MERCADOS · ILUSIÓN</div>
+        <div class="card-title">OPENAI A $852B: CUANDO EL HYPE SE CONVIERTE EN ESTADO DE ÁNIMO COLECTIVO</div>
+        <div class="card-body">Levantaron $122B, valen casi un billón, quieren hacer IPO. El mercado nunca aprendió nada del 2000. Al menos esta vez hay revenue real.</div>
+        <div class="card-meta">06.04.2026 // CNBC</div>
+      </div>
+    </div>
+    <div class="card" onclick="openModal('m3')">
+      <div class="card-img-wrap"><img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80" alt="Money"></div>
+      <div class="card-content">
+        <div class="card-badge">VC · EUFORIA</div>
+        <div class="card-title">Q1 2026: $297 BILLONES. EL DINERO DE VC SIGUE SIN APRENDER A NADAR</div>
+        <div class="card-body">Récord histórico de inversión en startups. 2.5x el trimestre anterior. La IA lo justifica todo. Hasta que no lo haga más y nadie recuerde haber estado de acuerdo.</div>
+        <div class="card-meta">06.04.2026 // BC Tech</div>
+      </div>
+    </div>
+    <div class="card" onclick="openModal('m4')">
+      <div class="card-img-wrap"><img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&q=80" alt="Chips"></div>
+      <div class="card-content">
+        <div class="card-badge">CHIPS · GEOPOLÍTICA</div>
+        <div class="card-title">BROADCOM + GOOGLE + ANTHROPIC: LA TRINIDAD DEL COMPUTE EXCLUSIVO</div>
+        <div class="card-body">3.5 gigawatts para Anthropic. Chips custom para Google. El acceso a infraestructura de IA se feudaliza. Y vos no estás en la lista VIP.</div>
+        <div class="card-meta">06.04.2026 // CNBC</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span>// <span class="accent">opinión</span> y teasers //</span>
+    <span class="count">02 items</span>
+  </div>
+
+  <div class="teasers">
+    <div class="teaser" onclick="openModal('m5')">
+      <div class="teaser-title">NIST QUIERE REGULAR AGENTES DE IA (Y NADIE SABE QUÉ ES UN AGENTE DE IA)</div>
+      <div class="teaser-body">El gobierno americano descubrió que los agentes autónomos de IA existen y tienen vectores de ataque. Bienvenidos al debate que la industria lleva dos años teniendo sin resolución.</div>
+      <div class="teaser-meta">04.2026 // CNBC // <span style="color:var(--green);">leer →</span></div>
+    </div>
+    <div class="teaser editor">
+      <div class="teaser-title">// OPINIÓN DEL EDITOR //</div>
+      <div class="teaser-body">Vivimos un momento histórico: la IA tiene más dinero que sentido común, más compute que casos de uso reales, y más regulación que comprensión. Pero también, honestamente, más potencial real que cualquier tecnología en décadas. El cinismo es cómodo. La pregunta es qué hacés con él.</div>
+      <div class="teaser-meta">— la redacción // 08.04.2026</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">&lt;EL_ALGORITMO/&gt;</div>
+  <p>// tech sin filtros para devs, founders y tech workers de LATAM //</p>
+  <p style="margin-top:0.4rem;">© 2026 // MIÉRCOLES 08.04.2026</p>
+</footer>
+
+<div class="modal-overlay" id="m1"><div class="modal">
+  <button class="modal-close" onclick="closeModal('m1')">✕ cerrar</button>
+  <img class="modal-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1000&q=80">
+  <div class="modal-content">
+    <div class="modal-badge">EFICIENCIA ENERGÉTICA</div>
+    <div class="modal-title">LA IA PODRÍA CONSUMIR 100X MENOS ENERGÍA</div>
+    <div class="modal-sub">Resulta que había una forma más inteligente de hacer todo esto. Llevamos 10 años haciéndolo al revés.</div>
+    <div class="modal-meta">05.04.2026 // ScienceDaily // Feature</div>
+    <div class="modal-body">
+      <p>Investigadores publicaron esta semana que una arquitectura híbrida que combina redes neuronales con razonamiento simbólico puede reducir el consumo energético de los sistemas de IA hasta 100 veces, sin pérdida de precisión. La idea central: en vez de tirar compute bruto a los problemas, dejar que el sistema razone de forma lógica en vez de estadística. Revolucionario. O sea, como piensan los humanos. Revolucionario que tardamos tanto en intentarlo.</p>
+      <p>El problema obvio que nadie quiere nombrar: toda la infraestructura de IA actual está construida alrededor del paradigma de "más es más". Nvidia vale un par de billones de dólares. Google, Microsoft y Amazon tienen decenas de miles de millones comprometidos en data centers. Si resulta que podrías hacer lo mismo con 1% de esa energía... bueno, alguien va a tener que explicarle eso a los accionistas. Spoiler: no va a ser una conversación cómoda.</p>
+      <p>La buena noticia para los developers: si esto se escala, el acceso a modelos potentes va a dejar de requerir infraestructura masiva. Los modelos locales podrían ser tan poderosos como los actuales en la nube. Eso democratiza el acceso, complica los business models de las big cloud, y básicamente reinicia la carrera desde el principio. Si sos founder o dev pensando en dónde apostar en los próximos 3 años, esta investigación es el tipo de señal que vale la pena seguir.</p>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="m2"><div class="modal">
+  <button class="modal-close" onclick="closeModal('m2')">✕ cerrar</button>
+  <img class="modal-img" src="https://images.unsplash.com/photo-1591696205602-2f950c417cb9?w=1000&q=80">
+  <div class="modal-content">
+    <div class="modal-badge">MERCADOS</div>
+    <div class="modal-title">OPENAI A $852B: EL HYPE QUE SE VOLVIÓ REAL</div>
+    <div class="modal-sub">Cuando el revenue alcanza a la valuación, ya no es hype. Es un problema diferente.</div>
+    <div class="modal-meta">06.04.2026 // CNBC</div>
+    <div class="modal-body">
+      <p>OpenAI cerró una ronda de $122B que la deja valuada en $852B. Para poner en perspectiva: eso es más que el PBI de muchos países. Lo interesante es que, a diferencia del hype del 2021, acá hay revenue real: $25B anualizados, con contratos enterprise que justifican buena parte de la valuación. Esto no es WeWork. Pero tampoco está libre de riesgo.</p>
+      <p>El IPO que se viene — posiblemente en 2026 — va a ser el evento de mercado más importante del sector tech en años. La pregunta no es si OpenAI puede hacer IPO. La pregunta es a qué múltiplo el mercado público está dispuesto a comprarlo. Los fondos privados pagaron valuaciones de empresa de plataforma madura. El mercado público suele ser más conservador con empresas que tienen competencia intensa y presión regulatoria global.</p>
+      <p>Para los devs y founders de LATAM: esto importa porque el IPO de OpenAI va a determinar el floor de valuación para todo el ecosistema de IA. Si sale bien, hay más capital disponible para todos. Si sale mal o se pospone, hay corrección de valuaciones en toda la cadena. No es para paranoia, pero sí para tenerlo en el radar si estás levantando ronda en 2026.</p>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="m3"><div class="modal">
+  <button class="modal-close" onclick="closeModal('m3')">✕ cerrar</button>
+  <img class="modal-img" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1000&q=80">
+  <div class="modal-content">
+    <div class="modal-badge">VENTURE CAPITAL</div>
+    <div class="modal-title">$297B EN Q1: RÉCORD HISTÓRICO Y PREGUNTA INCÓMODA</div>
+    <div class="modal-sub">Nunca se invirtió tanto en tan poco tiempo. Eso no siempre es buena señal.</div>
+    <div class="modal-meta">06.04.2026 // BC Technology</div>
+    <div class="modal-body">
+      <p>Q1 2026 rompió todos los récords: $297B en funding global para startups, un 2.5x respecto al Q4 2025. La IA domina el breakdown: no sólo en foundational models sino en la capa de aplicaciones, herramientas de developer, infraestructura y verticales empresariales. El dinero no discrimina tesis de inversión, y en este momento, cualquier pitch con "IA" en el deck levanta.</p>
+      <p>La pregunta incómoda que ningún VC hace en las pitch meetings: ¿cuántos de estos $297B van a producir retornos reales? El historial sugiere que en los picos de inversión, la calidad promedio de las compañías financiadas cae. No porque los founders sean peores, sino porque el capital abundante reduce la presión para validar supuestos antes de levantar. El resultado clásico es una ola de consolidación 18-24 meses después.</p>
+      <p>Lo que hace diferente este ciclo: una porción significativa del capital está yendo a infraestructura que tiene valor independientemente de cuál modelo específico gane. Eso reduce pero no elimina el riesgo sistémico. Para startups de aplicaciones que levantaron en este entorno: hay que construir como si el próximo año fuera a ser más frío. Porque probablemente lo sea.</p>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="m4"><div class="modal">
+  <button class="modal-close" onclick="closeModal('m4')">✕ cerrar</button>
+  <img class="modal-img" src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=1000&q=80">
+  <div class="modal-content">
+    <div class="modal-badge">SEMICONDUCTORES</div>
+    <div class="modal-title">BROADCOM + ANTHROPIC: LA FEUDALIZACIÓN DEL COMPUTE</div>
+    <div class="modal-sub">3.5 gigawatts para unos pocos. El acceso a infraestructura de IA se está estratificando.</div>
+    <div class="modal-meta">06.04.2026 // CNBC</div>
+    <div class="modal-body">
+      <p>Broadcom llegó a acuerdos expandidos con Google (para producir las próximas versiones de sus chips de IA custom) y con Anthropic (acceso a 3.5 gigawatts de capacidad compute vía la infraestructura de Google). Son números de otra escala. 3.5 gigawatts es una fracción relevante de toda la capacidad de compute de IA dedicada que existe en el mundo ahora mismo.</p>
+      <p>Lo que esto señala: las top AI labs están dejando de depender del mercado abierto de hardware y están firmando acuerdos estratégicos con fabricantes de chips y clouds. En la práctica, esto crea una división entre los que tienen acceso garantizado a compute premium y los que tienen que competir en el mercado spot. Para startups early stage, eso significa que la ventaja de los incumbentes no es solo el modelo, es la infraestructura que nadie más puede conseguir.</p>
+      <p>Para developers y founders construyendo sobre APIs: esto importa porque estas inversiones en chips custom eventualmente se traducen en mejor performance y menor costo para los end users. Pero también significa que la consolidación en el layer de modelos fundamentales probablemente va a continuar. Las startups de aplicaciones deberían construir agnósticas al modelo, porque el proveedor más barato de hoy puede no serlo en 12 meses.</p>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="m5"><div class="modal">
+  <button class="modal-close" onclick="closeModal('m5')">✕ cerrar</button>
+  <img class="modal-img" src="https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=1000&q=80">
+  <div class="modal-content">
+    <div class="modal-badge">REGULACIÓN</div>
+    <div class="modal-title">NIST Y LOS AGENTES DE IA: REGULANDO LO QUE NO ENTIENDEN TODAVÍA</div>
+    <div class="modal-sub">Bienvenidos al momento en que el gobierno descubre los multi-agent systems.</div>
+    <div class="modal-meta">04.2026 // CNBC</div>
+    <div class="modal-body">
+      <p>El NIST anunció que está desarrollando estándares de seguridad para agentes de IA: sistemas autónomos que pueden ejecutar tareas multi-paso vía APIs. La iniciativa reconoce lo que la industria ya sabe hace rato: los agentes de IA introducen vectores de ataque que los frameworks de ciberseguridad actuales no fueron diseñados para manejar.</p>
+      <p>El problema técnico es real. Un agente de IA que tiene acceso a tu base de datos, puede ejecutar código, hacer llamadas a APIs externas, y tomar decisiones sin aprobación humana directa, es un sistema con una superficie de ataque gigante. Prompt injection, supply chain attacks en los modelos base, y privilege escalation son problemas que el campo de seguridad está apenas empezando a entender sistemáticamente.</p>
+      <p>El cinismo fácil sería decir "van a publicar un estándar que nadie va a implementar". El cinismo inteligente dice: cuando NIST publica estándares, eventualmente se vuelven requerimientos contractuales en enterprise y gobierno. Si estás construyendo productos con agentes de IA para clientes corporativos, tener esto en el radar ahora —antes de que sea un requerimiento— puede ser una ventaja competitiva real.</p>
+    </div>
+  </div>
+</div></div>
+
+<script>
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',function(e){if(e.target===el){el.classList.remove('open');document.body.style.overflow='';}});});
+</script>
+</body>
+</html>
