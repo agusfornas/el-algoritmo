@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Algoritmo — Tech sin filtros</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #0d0d12; --green: #00e676; --purple: #7c3aed; --white: #f0f0f0; --gray: #888; --card: #141420; --border: #1e1e2e; }
+  body { background: var(--bg); color: var(--white); font-family: 'Space Grotesk', sans-serif; font-size: 16px; line-height: 1.6; }
+  a { color: inherit; text-decoration: none; }
+
+  /* Top bar */
+  .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 200; }
+  .topbar-logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; color: var(--green); }
+  .topbar-logo span { color: var(--white); }
+  .topbar-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gray); }
+  .topbar-tag { font-size: 11px; color: var(--gray); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Ticker */
+  .ticker-wrap { background: var(--purple); padding: 8px 0; overflow: hidden; white-space: nowrap; }
+  .ticker-inner { display: inline-block; animation: ticker 40s linear infinite; }
+  .ticker-inner:hover { animation-play-state: paused; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .ticker-item { display: inline-block; margin-right: 60px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .ticker-item::before { content: "▶ "; color: var(--green); }
+
+  /* Main layout */
+  main { max-width: 1140px; margin: 0 auto; padding: 40px 5% 60px; }
+
+  /* Hero card */
+  .hero-card { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--green); padding: 36px; margin-bottom: 36px; cursor: pointer; transition: border-color 0.2s; }
+  .hero-card:hover { border-left-color: var(--purple); }
+  .hero-card:hover .hero-title { color: var(--green); }
+  .tag { display: inline-block; background: var(--green); color: var(--bg); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; margin-bottom: 16px; }
+  .tag.purple { background: var(--purple); color: var(--white); }
+  .tag.red { background: #ff4444; color: var(--white); }
+  .hero-title { font-size: 1.8rem; font-weight: 700; line-height: 1.2; margin-bottom: 14px; transition: color 0.2s; }
+  .hero-deck { color: var(--gray); font-size: 0.95rem; line-height: 1.65; margin-bottom: 16px; }
+  .hero-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gray); }
+  .hero-meta span { color: var(--green); }
+
+  /* Grid */
+  .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 36px; }
+  .news-card { background: var(--card); border: 1px solid var(--border); padding: 24px; cursor: pointer; transition: border-color 0.2s; }
+  .news-card:hover { border-color: var(--green); }
+  .news-card:hover .news-title { color: var(--green); }
+  .news-title { font-size: 1.05rem; font-weight: 700; line-height: 1.35; margin-bottom: 12px; transition: color 0.2s; }
+  .news-excerpt { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
+
+  /* Teasers */
+  .teasers { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 36px; }
+  .teaser { background: var(--card); border: 1px solid var(--border); border-top: 2px solid var(--purple); padding: 20px; cursor: pointer; }
+  .teaser:hover .teaser-title { color: var(--purple); }
+  .teaser-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--purple); text-transform: uppercase; margin-bottom: 8px; }
+  .teaser-title { font-size: 0.95rem; font-weight: 600; line-height: 1.4; transition: color 0.2s; }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding: 28px 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-logo { font-size: 1.1rem; font-weight: 700; color: var(--green); }
+  .footer-text { font-size: 11px; color: var(--gray); }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 1000; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--green); max-width: 720px; width: 100%; padding: 48px 44px 36px; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--gray); font-family: 'Space Grotesk', sans-serif; }
+  .modal-close:hover { color: var(--green); }
+  .modal-tag { display: inline-block; background: var(--green); color: var(--bg); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; margin-bottom: 16px; }
+  .modal-title { font-size: 1.6rem; font-weight: 700; line-height: 1.25; margin-bottom: 12px; }
+  .modal-deck { font-size: 0.95rem; color: var(--gray); margin-bottom: 20px; }
+  .modal-line { border: none; border-top: 1px solid var(--green); margin: 20px 0; }
+  .modal-body p { margin-bottom: 18px; line-height: 1.75; font-size: 0.93rem; color: #d0d0e0; }
+
+  @media (max-width: 768px) {
+    .news-grid { grid-template-columns: 1fr; }
+    .teasers { grid-template-columns: 1fr; }
+    .hero-title { font-size: 1.35rem; }
+    .modal { padding: 36px 20px 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-logo">El <span>Algoritmo</span></div>
+  <div class="topbar-date">// martes 5 mayo 2026</div>
+  <div class="topbar-tag">Tech sin filtros</div>
+</div>
+
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <span class="ticker-item">Pentagon compra IA militar por mayor</span>
+    <span class="ticker-item">OpenAI le da la espalda a Microsoft</span>
+    <span class="ticker-item">2026: el año que la IA hackea a todos</span>
+    <span class="ticker-item">Los doctores siguen ganandole a la IA (por ahora)</span>
+    <span class="ticker-item">VCs tiran $800M a infraestructura IA</span>
+    <span class="ticker-item">Anthropic: el unico adulto en la sala, excluido por eso</span>
+    <span class="ticker-item">Pentagon compra IA militar por mayor</span>
+    <span class="ticker-item">OpenAI le da la espalda a Microsoft</span>
+    <span class="ticker-item">2026: el año que la IA hackea a todos</span>
+    <span class="ticker-item">Los doctores siguen ganandole a la IA (por ahora)</span>
+    <span class="ticker-item">VCs tiran $800M a infraestructura IA</span>
+    <span class="ticker-item">Anthropic: el unico adulto en la sala, excluido por eso</span>
+  </div>
+</div>
+
+<main>
+  <!-- Hero -->
+  <div class="hero-card" onclick="openModal('m1')">
+    <span class="tag">BREAKING / GEOPOLITICA IA</span>
+    <h1 class="hero-title">EL PENTÁGONO FIRMA CON OCHO GIGANTES TECH PARA METER IA EN REDES MILITARES CLASIFICADAS — ANTHROPIC QUEDA AFUERA POR PEDIR GUARDARRAÍLES DE SEGURIDAD</h1>
+    <p class="hero-deck">OpenAI, Google, Microsoft, Amazon, Oracle, SpaceX, Nvidia y Reflection van a tener sus modelos corriendo en redes clasificadas del Departamento de Defensa. Anthropic — el único que pidió que no usaran sus modelos para matar gente sin supervisión — fue rechazado. Spoiler: ahora están negociando de nuevo porque "hicieron avances técnicos importantes". O sea, cedieron.</p>
+    <div class="hero-meta">martes 5 mayo 2026 &middot; <span>analisis editorial</span> &middot; 8 min</div>
+  </div>
+
+  <!-- Grid 3 noticias -->
+  <div class="news-grid">
+    <div class="news-card" onclick="openModal('m2')">
+      <span class="tag purple">OPENAI</span>
+      <h2 class="news-title">GPT-5.5 LLEGA Y OPENAI LE DICE CHAU A LA EXCLUSIVIDAD CON MICROSOFT — AHORA TAMBIÉN ESTÁ EN AMAZON Y PRONTO EN GOOGLE</h2>
+      <p class="news-excerpt">El modelo más capaz hasta ahora, con mejoras reales en tareas agentivas. Y de paso, OpenAI decide que depender de un solo partner de infra no es tan buen negocio. Microsoft invirtió $13B y ahora ve cómo dilutan su moat.</p>
+    </div>
+    <div class="news-card" onclick="openModal('m3')">
+      <span class="tag red">SEGURIDAD</span>
+      <h2 class="news-title">MANDIANT CONFIRMA: 2026 ES EL AÑO EN QUE LA IA ROMPIÓ LA CIBERSEGURIDAD PARA SIEMPRE</h2>
+      <p class="news-excerpt">28.3% de las vulnerabilidades son explotadas en menos de 24 horas de ser publicadas. Un solo actor usó Claude Code para extorsionar a 17 organizaciones simultáneamente. Bienvenidos al futuro que nadie quería.</p>
+    </div>
+    <div class="news-card" onclick="openModal('m4')">
+      <span class="tag">CIENCIA</span>
+      <h2 class="news-title">STANFORD EN NATURE: LOS MEJORES AGENTES DE IA HACEN LA MITAD DE LO QUE HACE UN CIENTÍFICO CON DOCTORADO — SÍ, LA MITAD</h2>
+      <p class="news-excerpt">Después de dos años de hype sobre "IA que va a descubrir la cura del cáncer sola", un reporte serio mide el rendimiento real. Resultado: 50% del nivel humano en tareas científicas complejas. El gap existe y es grande.</p>
+    </div>
+  </div>
+
+  <!-- Teasers -->
+  <div class="teasers">
+    <div class="teaser" onclick="openModal('m5')">
+      <div class="teaser-label">// venture capital</div>
+      <div class="teaser-title">$800 MILLONES EN UNA SEMANA: VCS CANSADOS DEL HYPE COMPRAN INFRAESTRUCTURA — ShengShu $293M, Rogo $160M, Hightouch $150M, Avoca $125M</div>
+    </div>
+    <div class="teaser" onclick="openModal('m1')">
+      <div class="teaser-label">// opinion del dia</div>
+      <div class="teaser-title">CUANDO EL UNICO QUE PIDE GUARDARRAÍLES DE SEGURIDAD QUEDA AFUERA DEL CONTRATO, LA SEÑAL DEL SISTEMA ES CLARA — Y ES PREOCUPANTE</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">El Algoritmo</div>
+  <div class="footer-text">Tech sin filtros para LATAM &middot; Mayo 2026</div>
+  <div class="footer-text">Hecho para los que entienden y no se tragan el hype</div>
+</footer>
+
+<!-- Modals -->
+<div class="modal-overlay" id="m1" onclick="if(event.target===this)closeModal('m1')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('m1')">&times;</button>
+    <span class="modal-tag">GEOPOLÍTICA IA</span>
+    <h2 class="modal-title">El Pentágono Firma con 8 Gigantes Tech — Anthropic Queda Afuera Por Ser el Único Adulto en la Sala</h2>
+    <p class="modal-deck">El DoD mete IA en redes militares clasificadas. Anthropic pide guardarraíles de seguridad. El DoD dice no. Anthropic queda afuera. Sorprendente a nadie.</p>
+    <hr class="modal-line">
+    <div class="modal-body">
+      <p>Acá está la situación, sin adornos: el Departamento de Defensa de Estados Unidos acaba de firmar acuerdos con OpenAI, Google, Microsoft, Amazon, Oracle, SpaceX, Nvidia y Reflection para usar sus modelos de IA dentro de redes militares clasificadas. Eso incluye, según los documentos disponibles, análisis de inteligencia, logística, planificación operacional y, en algunos casos, sistemas de soporte para decisiones letales. Traducción: IA ayudando a decidir a quién matar.</p>
+      <p>¿Quién quedó afuera? Anthropic. ¿Por qué? Porque fueron los únicos que pidieron que el contrato incluyera guardarraíles específicos de seguridad para el uso bélico de sus modelos. La administración Trump dijo que no. Entonces los dejaron fuera. La ironía es perfecta: la empresa que más invirtió en seguridad de IA queda excluida del contrato de IA más grande de la historia porque pidió seguridad. El resto firmó sin chistar.</p>
+      <p>La parte que más debería preocuparnos no es Anthropic (que probablemente va a volver a negociar y va a ceder en algo, porque son $X billones encima de la mesa). Lo que debería preocuparnos es la señal sistémica: si poner condiciones de seguridad te excluye del contrato, el incentivo estructural para las demás empresas es claro — no pongas condiciones de seguridad. Eso es exactamente la dinámica que los investigadores de riesgo de IA llevan años tratando de evitar. Y acaba de quedar formalizada en un contrato federal.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m2" onclick="if(event.target===this)closeModal('m2')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('m2')">&times;</button>
+    <span class="modal-tag">OPENAI</span>
+    <h2 class="modal-title">GPT-5.5 y la Traición Estratégica a Microsoft: OpenAI Distribuye en Amazon y Pronto en Google</h2>
+    <p class="modal-deck">El modelo más capaz hasta la fecha, con mejoras reales en agentes autónomos. Y de yapa, OpenAI decide que la dependencia de un solo proveedor de nube no es un buen negocio.</p>
+    <hr class="modal-line">
+    <div class="modal-body">
+      <p>GPT-5.5 llegó y, sí, es mejor que GPT-5. Los benchmarks independientes confirman mejoras reales en tareas agentivas largas — esas donde el modelo tiene que usar herramientas, iterar, investigar y ejecutar código de manera autónoma por períodos extendidos. También mejoras en razonamiento científico y seguimiento de instrucciones complejas. No es el salto generacional más dramático de la historia, pero si sos founder o PM que depende de estas capacidades en producción, la mejora en confiabilidad y coherencia en chains largas es bienvenida.</p>
+      <p>Pero la noticia real no es el modelo. Es la distribución. OpenAI anunció que está relajando las cláusulas de exclusividad que ataban sus modelos más capaces al Azure de Microsoft. Ahora también van a distribuir a través de AWS, y hay conversaciones avanzadas con Google Cloud. Microsoft invirtió más de $13 mil millones en OpenAI contando con ese moat. Ahora lo están diluyendo. La reacción interna en Redmond debe ser interesante.</p>
+      <p>La lógica estratégica es clara: en el mundo donde los modelos de IA se vuelven infraestructura crítica, quien controla la distribución captura el valor, no solo quien desarrolla los modelos. OpenAI está aprendiendo la lección que el mundo del software enterprise conoce hace décadas — la dependencia de un solo partner de infraestructura es una vulnerabilidad a largo plazo. ¿Va a responder Microsoft? Probablemente acelere su propio desarrollo de modelos internos. Quedan años de esta guerra por delante.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m3" onclick="if(event.target===this)closeModal('m3')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('m3')">&times;</button>
+    <span class="modal-tag">SEGURIDAD</span>
+    <h2 class="modal-title">2026: El Año que la IA Rompió la Ciberseguridad — 28.3% de CVEs Explotados en Menos de 24 Horas</h2>
+    <p class="modal-deck">Mandiant publica su reporte anual y los números son lo suficientemente malos como para que valga la pena leerlos aunque te arruinen el día.</p>
+    <hr class="modal-line">
+    <div class="modal-body">
+      <p>El M-Trends 2026 de Mandiant es el tipo de documento que los equipos de seguridad van a usar para justificar aumentos de presupuesto por los próximos tres años, y con razón. El dato más impactante: 28.3% de todas las vulnerabilidades publicadas (CVEs) son explotadas activamente en menos de 24 horas de su divulgación pública. Hace dos años eso era impensable. Hoy es la norma. La razón técnica es simple: las herramientas de IA redujeron dramáticamente el tiempo y expertise necesario para convertir una vulnerabilidad teórica en un exploit desplegable.</p>
+      <p>El caso más cinematográfico del reporte: un solo actor de amenaza usó Claude Code — la herramienta de IA para developers de Anthropic — para conducir una campaña de extorsión simultánea contra 17 organizaciones. El tempo operacional y la paralelización que requiere ese ataque antes necesitaban un grupo criminal coordinado. Ahora lo hace una persona sola con la herramienta correcta. Eso es un cambio cualitativo en la asimetría ofensa/defensa, y no es para bien de los defensores.</p>
+      <p>¿Qué se hace con esto? Primero, aceptar que el modelo donde tenés semanas entre que sale una vuln y que alguien la explota ya no existe. El parcheo tiene que ser casi en tiempo real, lo que para la mayoría de las organizaciones con sistemas legacy es prácticamente imposible. Segundo, la detección de anomalías tiene que ser más agresiva y más automatizada. Tercero — y esto es lo que nadie quiere escuchar — probablemente tengas que asumir que ya estás comprometido y diseñar para contención y recuperación, no solo para prevención. Bienvenido al mundo nuevo.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m4" onclick="if(event.target===this)closeModal('m4')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('m4')">&times;</button>
+    <span class="modal-tag">CIENCIA / REALIDAD CHECK</span>
+    <h2 class="modal-title">Stanford en Nature: Los Agentes de IA Hacen la Mitad de lo que Hace un Científico con PhD</h2>
+    <p class="modal-deck">Después de dos años de "la IA va a reemplazar a los científicos", el Stanford HAI mide el rendimiento real. La brecha es real y es grande.</p>
+    <hr class="modal-line">
+    <div class="modal-body">
+      <p>El AI Index Report 2026 del Stanford Institute for Human-Centered AI, publicado esta semana en Nature, tiene el raro valor de medir cosas que el hype preferiría no medir. En benchmarks rigurosos de tareas científicas complejas — investigación real, no exámenes estandarizados — los mejores agentes de IA disponibles hoy rinden al 50% del nivel de un científico con doctorado. No es un gap pequeño. Es enorme. Y es importante porque contradice años de narrativa sobre la inminente superinteligencia científica.</p>
+      <p>El matiz que vale la pena agregar: esto no significa que la IA sea inútil en ciencia. Significa que como reemplazo autónomo de investigadores avanzados, todavía está lejos. Como herramienta auxiliar que acelera partes específicas del proceso — síntesis de literatura, limpieza de datos, generación de hipótesis desde corpus grandes — puede ser enormemente valiosa. La pregunta más interesante que el reporte levanta de costado es si esa utilidad auxiliar está imperceptiblemente cambiando qué preguntas hacemos, sesgando la ciencia hacia problemas que la IA puede ayudar a resolver en lugar de los que más vale la pena resolver.</p>
+      <p>La distribución importa más que el promedio. Probablemente hay subconjuntos de tareas donde los agentes de IA ya igualan o superan a los humanos — síntesis de papers, análisis de datasets estructurados. Y hay otros donde el gap es mucho mayor que 2x: intuición experimental, saltos creativos, lo que define la ciencia transformadora. El error sería usar el número promedio para concluir que "la IA es 50% buena en ciencia". La conclusión correcta es más matizada: sabemos dónde funciona bien, hay que dejar de usarla donde no funciona bien.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m5" onclick="if(event.target===this)closeModal('m5')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('m5')">&times;</button>
+    <span class="modal-tag">VENTURE CAPITAL</span>
+    <h2 class="modal-title">$800M en Una Semana: Los VCs Descubrieron que la Infraestructura de IA es el Negocio Real</h2>
+    <p class="modal-deck">ShengShu $293M, Rogo $160M, Hightouch $150M, Avoca $125M, Parallel Web $100M. Esta semana el capital inteligente habló fuerte.</p>
+    <hr class="modal-line">
+    <div class="modal-body">
+      <p>Si querés saber qué piensan realmente los VCs sofisticados sobre el futuro de la IA, no les preguntes — mirá a dónde van los cheques grandes. Esta semana hablan claro: ShengShu Technology ($293M para IA de "world model" multimodal), Rogo ($160M Serie D para automatización de workflows financieros con IA), Hightouch ($150M Serie D para infraestructura de datos de clientes), Avoca ($125M Serie B para soporte al cliente con IA), y Parallel Web Systems ($100M a valuación de $2B por APIs de research e investigación). Total: más de $800M en una sola semana.</p>
+      <p>El patrón es intencional. Cada una de estas empresas opera en la capa de infraestructura — los componentes aburridos pero críticos que hacen que la IA sea desplegable a escala empresarial: pipelines de datos, optimización de inferencia, distribución de APIs, automatización de workflows. Esto es el contrapunto al froth de la capa de aplicaciones que caracterizó las etapas anteriores del boom, cuando startups de consumo con mínima diferenciación técnica levantaban valuaciones estratosféricas. Los inversores sofisticados llegaron a la conclusión, tardía pero firme, de que la capa de aplicaciones se va a commoditizar a medida que los modelos mejoren.</p>
+      <p>El dato que más me llama la atención: Tsavorite, una startup de hardware de IA que está desarrollando una "Omni Processing Unit" que integra CPU, GPU y memoria en un solo chip, levantó seed esta semana prometiendo reducir el consumo energético de inferencia en más del 90%. Si eso es real en producción, el impacto en la economía de escala de la IA es enorme. El costo energético de correr LLMs a escala empresarial se convirtió en una de las restricciones más binding del deployment. La próxima década del sector va a estar determinada tanto por las facturas de luz como por los benchmarks de los modelos.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { document.querySelectorAll('.modal-overlay.active').forEach(m => { m.classList.remove('active'); document.body.style.overflow = ''; }); } });
+</script>
+</body>
+</html>
